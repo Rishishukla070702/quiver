@@ -1,0 +1,22 @@
+# Binaries
+/bin/
+*.exe
+*.out
+
+# Test / coverage artifacts
+*.test
+coverage.*
+
+# Local data (embeddings, indexes, snapshots we'll generate later)
+/data/
+*.wal
+*.snapshot
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Personal docs — never publish
+Rishi_Shukla_Resume.pdf
+*.pdf
