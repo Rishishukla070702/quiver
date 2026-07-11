@@ -7,7 +7,7 @@ Built as a from-first-principles learning project: HNSW approximate-nearest-neig
 index, WAL-backed persistence, concurrent access, benchmarked against production
 vector databases. See [`ROADMAP.md`](./ROADMAP.md) for the full plan and progress.
 
-> Status: **M0 — scaffold** ✅ · next: M1 (distance metrics + flat index)
+> Status: **M1 — distance metrics + flat index** ✅ · next: M2 (HTTP server)
 
 ## Quick start
 

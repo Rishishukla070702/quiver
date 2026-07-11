@@ -5,9 +5,6 @@ import (
 	"testing"
 )
 
-// TestDot uses a "table-driven test" — the idiomatic Go pattern. Instead of one
-// function per case, we list cases in a slice and loop over them. t.Run gives
-// each case its own name in the output, so a failure tells you exactly which one.
 func TestDot(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -24,8 +21,6 @@ func TestDot(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Dot(tt.a, tt.b)
-
-			// errors.Is is how you compare errors in Go (handles wrapping).
 			if !errors.Is(err, tt.wantErr) {
 				t.Fatalf("Dot() error = %v, want %v", err, tt.wantErr)
 			}
@@ -36,9 +31,6 @@ func TestDot(t *testing.T) {
 	}
 }
 
-// TestL2 defines what a correct L2 looks like. It fails until you implement L2.
-// (I picked cases whose answers are exact whole numbers, so we can compare
-// floats directly without worrying about rounding for now.)
 func TestL2(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -47,7 +39,7 @@ func TestL2(t *testing.T) {
 		wantErr error
 	}{
 		{name: "identical", a: Vector{1, 2, 3}, b: Vector{1, 2, 3}, want: 0},
-		{name: "3-4-5 triangle", a: Vector{0, 0}, b: Vector{3, 4}, want: 5}, // sqrt(9+16)=5
+		{name: "3-4-5 triangle", a: Vector{0, 0}, b: Vector{3, 4}, want: 5}, // sqrt(9+16)
 		{name: "unit apart", a: Vector{1, 0}, b: Vector{0, 0}, want: 1},
 		{name: "dimension mismatch", a: Vector{1, 2}, b: Vector{1}, wantErr: ErrDimMismatch},
 	}
@@ -65,10 +57,9 @@ func TestL2(t *testing.T) {
 	}
 }
 
-// approxEqual compares floats with a small tolerance (epsilon). You almost never
-// compare floats with == in real code: operations like sqrt introduce tiny
-// rounding errors, so a "true" 1.0 might come out as 0.99999994. We assert
-// "close enough" instead. Cosine needs this; L2's cases were exact integers.
+// approxEqual reports whether a and b are within eps of each other. Cosine
+// results are compared with a tolerance because operations like sqrt introduce
+// small floating-point rounding errors that make exact equality unreliable.
 func approxEqual(a, b, eps float32) bool {
 	d := a - b
 	if d < 0 {
@@ -89,6 +80,8 @@ func TestCosine(t *testing.T) {
 		{name: "orthogonal", a: Vector{1, 0}, b: Vector{0, 1}, want: 0},
 		{name: "opposite", a: Vector{2, 0}, b: Vector{-3, 0}, want: -1},
 		{name: "same direction, bigger magnitude", a: Vector{1, 1}, b: Vector{2, 2}, want: 1},
+		{name: "zero vector (a)", a: Vector{0, 0}, b: Vector{1, 0}, wantErr: ErrZeroVector},
+		{name: "zero vector (b)", a: Vector{1, 0}, b: Vector{0, 0}, wantErr: ErrZeroVector},
 		{name: "dimension mismatch", a: Vector{1, 2}, b: Vector{1}, wantErr: ErrDimMismatch},
 	}
 
