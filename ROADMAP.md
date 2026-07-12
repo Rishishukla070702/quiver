@@ -87,6 +87,7 @@ Each milestone is independently demoable. Never a broken tree.
 - HTTP/JSON API: `POST /vectors`, `POST /query`, `DELETE /vectors/{id}`.
 - A tiny CLI/curl client; request validation; structured errors.
 - **Deliverable:** a running vector-search **server** you talk to over the network.
+- **Note:** a basic `sync.RWMutex` (the M6 concurrency baseline) was pulled forward here — an HTTP server is concurrent by default, so the index must be lock-guarded the moment it's exposed.
 - **Fundamentals:** networking, HTTP, serialization, API design.
 
 ### M3 — Real embeddings + real data  ·  ~1 week
@@ -108,10 +109,13 @@ Each milestone is independently demoable. Never a broken tree.
 - **Deliverable:** the DB survives restarts and crashes without data loss.
 - **Fundamentals:** storage engines, serialization, WAL, crash recovery, file I/O.
 
-### M6 — Concurrency + production concerns  ·  ~2 weeks
-- Safe concurrent reads/writes (RWMutex / per-segment locking); metadata filtering; batch ops.
-- **Deliverable:** correct under concurrent load (race detector clean: `go test -race`).
-- **Fundamentals:** Go concurrency model, locking, data-race avoidance.
+### M6 — Concurrency, done well + production concerns  ·  ~2 weeks
+- Baseline safety (a single `RWMutex`) already landed in **M2** — the HTTP server forced it.
+  M6 is the *optimization* pass: measure lock contention (needs M7 benchmarks), then consider
+  finer-grained/sharded locks or copy-on-write snapshots so reads never block.
+- Plus: metadata filtering; batch ops; make persistence (M5) concurrency-safe.
+- **Deliverable:** measured, low-contention concurrent performance (still `-race` clean).
+- **Fundamentals:** Go concurrency model, lock contention, read-optimized designs.
 
 ### M7 — Benchmarks + optimization  ·  ~2 weeks  ·  💰 the resume metrics
 - Harness measuring **recall@k, QPS, p50/p95/p99 latency, memory**.

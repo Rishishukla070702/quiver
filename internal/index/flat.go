@@ -7,6 +7,7 @@ package index
 
 import (
 	"sort"
+	"sync"
 
 	"github.com/Rishishukla070702/quiver/internal/vector"
 )
@@ -27,6 +28,7 @@ type entry struct {
 // FlatIndex stores every vector in a slice and answers a query by comparing it
 // against all of them. It is exact but runs in O(n) per query.
 type FlatIndex struct {
+	mu      sync.RWMutex
 	dim     int     // required dimensionality; every added vector must match this
 	entries []entry // all stored vectors, in insertion order
 	metric  Metric
@@ -52,6 +54,8 @@ func NewFlat(dim int, metric Metric) *FlatIndex {
 
 // Len reports how many vectors are stored.
 func (idx *FlatIndex) Len() int {
+	idx.mu.RLock()
+	defer idx.mu.RUnlock()
 	return len(idx.entries)
 }
 
@@ -61,6 +65,8 @@ func (idx *FlatIndex) Add(id string, vec vector.Vector) error {
 	if len(vec) != idx.dim {
 		return vector.ErrDimMismatch
 	}
+	idx.mu.Lock()
+	defer idx.mu.Unlock()
 	idx.entries = append(idx.entries, entry{id: id, vec: vec})
 	return nil
 }
@@ -76,12 +82,15 @@ func (idx *FlatIndex) Search(query vector.Vector, k int) ([]Result, error) {
 	if len(query) != idx.dim {
 		return nil, vector.ErrDimMismatch
 	}
+	idx.mu.RLock()
+	defer idx.mu.RUnlock()
 	results := make([]Result, 0, len(idx.entries))
 	for _, value := range idx.entries {
 		score, err := idx.metric.fn(query, value.vec)
 		if err != nil {
 			return nil, err
 		}
+
 		results = append(results, Result{ID: value.id, Score: score})
 	}
 	sort.Slice(results, func(i, j int) bool {
