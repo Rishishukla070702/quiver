@@ -2,6 +2,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
@@ -13,15 +14,17 @@ func main() {
 	// A small fixed dimension for now — easy to hand-type vectors when testing
 	// with curl. Later this becomes configurable (flag/env) and matches the
 	// embedding model's output size.
-	idx := index.NewFlat(3, index.Cosine)
-	srv := server.New(idx)
 
-	const addr = ":8080"
-	log.Printf("Quiver listening on %s", addr)
+	dim := flag.Int("dim", 384, "vector dimesionality")
+	addr := flag.String("addr", ":8080", "address to listen on")
+	flag.Parse()
+	idx := index.NewFlat(*dim, index.Cosine)
+	srv := server.New(idx)
+	log.Printf("Quiver listening on %s", *addr)
 
 	// ListenAndServe blocks, serving each request in its own goroutine, until
 	// the process is killed or it returns an error.
-	if err := http.ListenAndServe(addr, srv.Handler()); err != nil {
+	if err := http.ListenAndServe(*addr, srv.Handler()); err != nil {
 		log.Fatal(err)
 	}
 }

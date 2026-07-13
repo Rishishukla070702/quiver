@@ -1,0 +1,12 @@
+# Python dependencies for the M3 embedding scripts (embed_and_load.py, search.py).
+#
+# Setup (one-time):
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r scripts/requirements.txt
+#
+# Then run Quiver (go run ./cmd/quiver) and:
+#   .venv/bin/python scripts/embed_and_load.py
+#   .venv/bin/python scripts/search.py "a pet that purrs" 3
+#
+# sentence-transformers pulls in torch, transformers, and numpy automatically.
+sentence-transformers==5.1.2

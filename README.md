@@ -7,7 +7,7 @@ Built as a from-first-principles learning project: HNSW approximate-nearest-neig
 index, WAL-backed persistence, concurrent access, benchmarked against production
 vector databases. See [`ROADMAP.md`](./ROADMAP.md) for the full plan and progress.
 
-> Status: **M2 — concurrent HTTP server** ✅ · next: M3 (real embeddings + data)
+> Status: **M3 — real embeddings + semantic search** ✅ · next: M4 (HNSW index)
 
 ## Quick start
 

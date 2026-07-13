@@ -20,3 +20,8 @@ coverage.*
 # Personal docs — never publish
 Rishi_Shukla_Resume.pdf
 *.pdf
+
+# Python (embedding scripts)
+__pycache__/
+*.pyc
+.venv/
