@@ -13,11 +13,11 @@ import (
 
 // Server wraps a vector index and serves it over HTTP.
 type Server struct {
-	idx *index.FlatIndex
+	idx index.Index
 }
 
 // New returns a Server backed by idx.
-func New(idx *index.FlatIndex) *Server {
+func New(idx index.Index) *Server {
 	return &Server{idx: idx}
 }
 
