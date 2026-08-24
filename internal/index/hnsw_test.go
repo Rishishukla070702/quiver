@@ -180,3 +180,31 @@ func TestHNSWBuildsHierarchy(t *testing.T) {
 		t.Errorf("maxLevel = %d, want >= 1 (a hierarchy should form over 500 nodes)", h.maxLevel)
 	}
 }
+
+// TestHNSWDegreeBounded checks that pruning keeps node degree capped: after many
+// inserts, no node's layer-0 neighbour list should exceed maxDegree(0) = 2*M.
+func TestHNSWDegreeBounded(t *testing.T) {
+	rng := rand.New(rand.NewSource(9))
+	h := NewHNSW(8, L2, 8, 32) // M = 8
+	for i := 0; i < 2000; i++ {
+		v := make(vector.Vector, 8)
+		for j := range v {
+			v[j] = rng.Float32()
+		}
+		if err := h.Add(fmt.Sprintf("v%d", i), v); err != nil {
+			t.Fatalf("Add: %v", err)
+		}
+	}
+
+	cap0 := 2 * h.m
+	maxDeg := 0
+	for _, n := range h.nodes {
+		if d := len(n.neighbors[0]); d > maxDeg {
+			maxDeg = d
+		}
+	}
+	t.Logf("max layer-0 degree over %d nodes: %d (cap %d)", len(h.nodes), maxDeg, cap0)
+	if maxDeg > cap0 {
+		t.Errorf("max layer-0 degree = %d, want <= %d (pruneNeighbors should cap it)", maxDeg, cap0)
+	}
+}

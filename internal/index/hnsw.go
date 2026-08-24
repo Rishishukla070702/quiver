@@ -279,6 +279,7 @@ func (h *HNSW) Add(id string, vec vector.Vector) error {
 			nb := cands[i].index
 			h.nodes[newIdx].neighbors[l] = append(h.nodes[newIdx].neighbors[l], nb)
 			h.nodes[nb].neighbors[l] = append(h.nodes[nb].neighbors[l], newIdx)
+			h.pruneNeighbors(nb, l) // keep nb's degree bounded (see maxDegree)
 		}
 		ep = cands[0].index // carry the closest node down to the next layer
 	}
@@ -289,4 +290,57 @@ func (h *HNSW) Add(id string, vec vector.Vector) error {
 		h.maxLevel = level
 	}
 	return nil
+}
+
+// maxDegree is the neighbour cap for a layer. Layer 0 holds every node and takes
+// the most traffic, so it gets a higher cap (2*M) than the sparse upper layers
+// (M) — the standard HNSW choice.
+func (h *HNSW) maxDegree(layer int) int {
+	if layer == 0 {
+		return 2 * h.m
+	}
+	return h.m
+}
+
+// pruneNeighbors caps node nodeIdx's neighbour list on the given layer at
+// maxDegree(layer), keeping the neighbours CLOSEST to nodeIdx. Without it,
+// popular nodes accumulate unbounded edges and search degrades toward O(n).
+//
+// TODO(rishi): implement.
+//   - cap := h.maxDegree(layer); if len(current neighbours) <= cap, return early.
+//   - Otherwise score each neighbour nb by its distance to nodeIdx's own vector:
+//     h.metric.fn(h.nodes[nodeIdx].vec, h.nodes[nb].vec).
+//   - Sort the neighbours best-first with h.metric.better and keep the first cap.
+//     A small []struct{ idx int; score float32 } + sort.Slice is the clean way;
+//     then write the kept indices back to h.nodes[nodeIdx].neighbors[layer].
+func (h *HNSW) pruneNeighbors(nodeIdx, layer int) {
+	limit := h.maxDegree(layer)
+	if len(h.nodes[nodeIdx].neighbors[layer]) <= limit {
+		return
+	}
+
+	type neighbor struct {
+		idx   int
+		score float32
+	}
+
+	neighbors := make([]neighbor, 0, len(h.nodes[nodeIdx].neighbors[layer]))
+	for _, nb := range h.nodes[nodeIdx].neighbors[layer] {
+		score, err := h.metric.fn(h.nodes[nodeIdx].vec, h.nodes[nb].vec)
+		if err != nil {
+			continue // skip this neighbor if there's an error
+		}
+		neighbors = append(neighbors, neighbor{idx: nb, score: score})
+	}
+
+	sort.Slice(neighbors, func(i, j int) bool {
+		return h.metric.better(neighbors[i].score, neighbors[j].score)
+	})
+
+	keep := min(limit, len(neighbors)) // some neighbours may have been skipped on error
+	kept := make([]int, keep)
+	for i := 0; i < keep; i++ {
+		kept[i] = neighbors[i].idx
+	}
+	h.nodes[nodeIdx].neighbors[layer] = kept
 }
