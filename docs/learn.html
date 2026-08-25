@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiver — Learn Every Concept</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161c2b; --panel2:#1d2740; --ink:#e7ecf5; --muted:#9fb0cc;
+    --accent:#5db0ff; --accent2:#7ee0b8; --warn:#ffcf6b; --line:#2a3550; --code:#0b0f18;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0b0f18;
+    padding:.1em .4em;border-radius:4px;font-size:.9em;color:#cfe3ff}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;color:#cfe3ff}
+  .wrap{display:grid;grid-template-columns:260px 1fr;max-width:1200px;margin:0 auto;gap:0}
+  nav{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:24px 18px;
+    border-right:1px solid var(--line);background:#0c1119}
+  nav h1{font-size:18px;margin:0 0 4px}
+  nav .sub{color:var(--muted);font-size:12.5px;margin-bottom:16px}
+  nav a{display:block;color:var(--muted);padding:4px 0;font-size:14px}
+  nav a:hover{color:var(--ink);text-decoration:none}
+  .bar{height:6px;background:#0b0f18;border-radius:6px;margin:8px 0 16px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s}
+  main{padding:32px 40px 120px;max-width:820px}
+  header.hero{margin-bottom:28px}
+  header.hero h1{font-size:30px;margin:0 0 6px}
+  header.hero p{color:var(--muted);margin:.2em 0}
+  section{margin:34px 0;padding-top:8px;border-top:1px solid var(--line)}
+  section h2{font-size:22px;margin:.4em 0 .2em}
+  section > .lead{color:var(--muted);margin-top:0}
+  details.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:2px 16px;margin:12px 0}
+  details.card>summary{cursor:pointer;padding:12px 4px;font-weight:600;list-style:none;display:flex;
+    align-items:center;gap:10px}
+  details.card>summary::-webkit-details-marker{display:none}
+  details.card>summary::before{content:"▸";color:var(--accent);font-size:14px;transition:transform .2s}
+  details.card[open]>summary::before{transform:rotate(90deg)}
+  .tag{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    color:#0b0f18;background:var(--accent2);padding:2px 7px;border-radius:20px;margin-left:auto}
+  .tag.go{background:var(--accent)}
+  .body{padding:2px 4px 14px}
+  .jargon{font-size:13px;color:var(--warn);margin:.4em 0}
+  .jargon b{color:#ffe2a3}
+  details.q{background:var(--panel2);border:1px dashed var(--accent);border-radius:10px;margin:12px 0 4px;padding:2px 14px}
+  details.q>summary{cursor:pointer;color:var(--accent);font-weight:600;padding:10px 2px;list-style:none}
+  details.q>summary::-webkit-details-marker{display:none}
+  details.q .ans{padding:0 2px 12px;color:var(--ink)}
+  .flow{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;white-space:pre;
+    overflow:auto;font-family:ui-monospace,monospace;font-size:12.5px;color:#bfe0ff}
+  label.done{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px;margin:8px 0 2px;cursor:pointer}
+  .glossary input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);
+    background:#0b0f18;color:var(--ink);font-size:15px;margin:6px 0 14px}
+  .glossary dt{font-weight:700;color:var(--accent2);margin-top:12px}
+  .glossary dd{margin:2px 0 0;color:var(--ink)}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+    padding:2px 10px;font-size:12px;color:var(--muted);margin:2px 4px 2px 0}
+  .kbd{color:var(--muted);font-size:13px}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}nav{display:none}main{padding:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h1>🏹 Quiver</h1>
+  <div class="sub">Learn every concept</div>
+  <div class="bar"><i id="progbar"></i></div>
+  <div id="progtext" class="sub"></div>
+  <a href="#big">① Big picture</a>
+  <a href="#vectors">② Vectors &amp; embeddings</a>
+  <a href="#metrics">③ Distance metrics</a>
+  <a href="#flat">④ Index &amp; top-k (Flat)</a>
+  <a href="#iface">⑤ Interfaces &amp; abstraction</a>
+  <a href="#hnsw">⑥ ANN &amp; HNSW (the heart)</a>
+  <a href="#server">⑦ The HTTP server</a>
+  <a href="#concurrency">⑧ Concurrency</a>
+  <a href="#persist">⑨ Persistence (WAL)</a>
+  <a href="#bench">⑩ Benchmarks &amp; evaluation</a>
+  <a href="#go">⑪ Go concepts</a>
+  <a href="#flow">⑫ End-to-end flow</a>
+  <a href="#glossary">⑬ Glossary</a>
+  <a href="#quiz">⑭ Final self-test</a>
+</nav>
+<main>
+  <header class="hero">
+    <h1>Quiver — Understand Every Concept</h1>
+    <p>A guided tour of the vector database you built, from a single number to a benchmarked, durable search engine.</p>
+    <p class="kbd">How to use: click a concept to expand it · click <b style="color:var(--accent)">🤔 Check yourself</b> to reveal the answer · tick <b>“I get this”</b> to track progress (saved in your browser).</p>
+  </header>
+
+  <!-- ① BIG PICTURE -->
+  <section id="big">
+    <h2>① The 30-second big picture</h2>
+    <p class="lead">What does Quiver actually do?</p>
+    <p>It stores <b>vectors</b> (lists of numbers that capture the <i>meaning</i> of things) and, given a query, finds the <b>most similar</b> stored vectors — <b>fast</b>, even over millions. That powers semantic search, recommendations, and RAG.</p>
+    <div class="flow">TEXT ─► [embedding model] ─► VECTOR ──────────────► stored in the INDEX
+                                                     ▲
+QUERY TEXT ─► [same model] ─► QUERY VECTOR ──► SEARCH ┘ ─► k most similar ─► results</div>
+    <p>Everything else in this guide is a zoom-in on one box of that diagram.</p>
+    <label class="done"><input type="checkbox" data-k="big"> I get this</label>
+  </section>
+
+  <!-- ② VECTORS -->
+  <section id="vectors">
+    <h2>② Vectors &amp; embeddings</h2>
+    <p class="lead">The raw material.</p>
+
+    <details class="card"><summary>Vector <span class="tag">jargon</span></summary>
+      <div class="body">
+        <p>An ordered list of numbers, e.g. <code>[0.12, -0.03, 0.88, …]</code>. Geometrically, a <i>point</i> (or arrow) in space. In Quiver:</p>
+        <pre>type Vector []float32   // float32, not float64 — half the memory for millions of vectors</pre>
+        <p class="jargon"><b>Jargon:</b> <b>vector</b> = the list of numbers · <b>dimension</b> = how many numbers it has.</p>
+      </div>
+    </details>
+
+    <details class="card"><summary>Dimension <span class="tag">jargon</span></summary>
+      <div class="body">
+        <p>The length of the vector — how many numbers. <code>[1,0]</code> is 2-dimensional; a real text embedding is often <b>384</b>-dimensional. Think coordinates: <code>(x,y)</code> is 2-D, <code>(x,y,z)</code> is 3-D. Every vector in one index must share the same dimension.</p>
+      </div>
+    </details>
+
+    <details class="card"><summary>Embedding &amp; embedding model <span class="tag">jargon</span></summary>
+      <div class="body">
+        <p>An <b>embedding</b> is a vector produced by a neural net (the <b>embedding model</b>) trained so that things with <i>similar meaning</i> land at <i>nearby points</i>. "meaning becomes geometry." Quiver's demo uses <code>all-MiniLM-L6-v2</code> (outputs 384-dim). Quiver doesn't build the model — it stores and searches its output.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: why must the query and the stored vectors use the same model &amp; dimension?</summary>
+      <div class="ans">Because similarity is measured <b>component by component</b> (position 42 vs position 42). That's only meaningful if both vectors live in the <i>same space</i> — same size, and same model, since each position means the same learned feature only within one model. Mismatched size → Quiver returns <code>ErrDimMismatch</code> and refuses to compute nonsense.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="vectors"> I get this</label>
+  </section>
+
+  <!-- ③ METRICS -->
+  <section id="metrics">
+    <h2>③ Distance / similarity metrics</h2>
+    <p class="lead">How do you measure "how similar are two vectors?"</p>
+
+    <details class="card"><summary>Dot product <span class="tag">jargon</span></summary>
+      <div class="body"><p>Multiply matching components and sum them: <code>a[0]*b[0] + a[1]*b[1] + …</code>. The primitive the other metrics are built from.</p>
+      <pre>func Dot(a, b Vector) (float32, error) { /* sum a[i]*b[i] */ }</pre></div>
+    </details>
+
+    <details class="card"><summary>L2 / Euclidean distance <span class="tag">jargon</span></summary>
+      <div class="body"><p>Straight-line distance: <code>sqrt(sum((a[i]-b[i])²))</code>. <b>Smaller = more similar</b> (0 = identical). The everyday "how far apart" ruler distance. Used by the SIFT benchmark.</p></div>
+    </details>
+
+    <details class="card"><summary>Cosine similarity <span class="tag">jargon</span></summary>
+      <div class="body"><p>The cosine of the <i>angle</i> between two vectors: <code>Dot(a,b) / (‖a‖·‖b‖)</code>. Range −1…1: <b>1</b> = same direction, <b>0</b> = unrelated, <b>−1</b> = opposite. It compares <b>direction, ignoring magnitude</b> — which is why it's the default for <b>text</b> (meaning is in the direction; length is noise).</p>
+      <p class="jargon"><b>Jargon:</b> <b>magnitude / norm</b> (‖v‖) = a vector's length = <code>sqrt(sum(v[i]²))</code> · <b>metric</b> = the chosen similarity function.</p></div>
+    </details>
+
+    <details class="card"><summary>Why compare floats with an epsilon <span class="tag go">go</span></summary>
+      <div class="body"><p>Operations like <code>sqrt</code> introduce tiny rounding, so a "true" 1.0 might be 0.99999994. You never test floats with <code>==</code>; you check "within a tiny tolerance ε." (Exception: comparing to exactly 0 for a sum-of-squares is fine — it's 0 only if every term is 0.)</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: two docs on the same topic, one long, one short — which metric calls them similar, cosine or L2?</summary>
+      <div class="ans"><b>Cosine.</b> A long and short doc on the same topic point the <i>same direction</i> but have different <i>magnitudes</i> (length). Cosine ignores magnitude → high similarity. L2 would see them as far apart because of the length difference. That's why text search uses cosine.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="metrics"> I get this</label>
+  </section>
+
+  <!-- ④ FLAT INDEX -->
+  <section id="flat">
+    <h2>④ The index &amp; top-k search (FlatIndex)</h2>
+    <p class="lead">The simplest way to answer a query — correct, but slow.</p>
+
+    <details class="card"><summary>Index <span class="tag">jargon</span></summary>
+      <div class="body"><p>The structure that <i>stores</i> vectors and <i>answers</i> "find the k most similar." Quiver has two: <code>FlatIndex</code> (exact) and <code>HNSW</code> (fast/approximate).</p></div>
+    </details>
+
+    <details class="card"><summary>Brute force &amp; O(n) <span class="tag">jargon</span></summary>
+      <div class="body"><p><b>FlatIndex</b> compares the query against <i>every</i> stored vector. That's <b>O(n)</b> ("order n"): the work grows <i>linearly</i> with the number of vectors n. 10× the data → 10× the time. Exact, but doesn't scale.</p>
+      <p class="jargon"><b>Jargon:</b> <b>Big-O</b> = how cost grows with input size · <b>brute force</b> = check everything · <b>k-NN</b> = k nearest neighbors.</p></div>
+    </details>
+
+    <details class="card"><summary>top-k &amp; the search flow</summary>
+      <div class="body"><p><b>top-k</b> = return the k best matches. FlatIndex's <code>Search</code>: <b>validate</b> the query dimension → <b>score</b> every vector → <b>sort</b> best-first → <b>return</b> the top k. It's also Quiver's <i>correctness oracle</i>: its exact answers are what we grade the fast index against.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: why is FlatIndex "exact," and why won't it scale?</summary>
+      <div class="ans">Exact because it literally checks every vector — it can't miss the true nearest. Won't scale because that's O(n): at a million vectors every single query does a million comparisons. HNSW (§6) fixes the scaling by checking only ~log(n) of them.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="flat"> I get this</label>
+  </section>
+
+  <!-- ⑤ INTERFACES -->
+  <section id="iface">
+    <h2>⑤ Interfaces &amp; abstraction</h2>
+    <p class="lead">How the server runs <i>either</i> index without caring which.</p>
+
+    <details class="card"><summary>Interface (the Go kind) <span class="tag go">go</span></summary>
+      <div class="body"><p>An <b>interface</b> is a set of method signatures — a <i>contract</i>. Quiver's:</p>
+      <pre>type Index interface {
+    Add(id string, vec vector.Vector) error
+    Search(query vector.Vector, k int) ([]Result, error)
+    Len() int
+}</pre>
+      <p>The Go twist: satisfaction is <b>implicit</b> — no <code>implements</code> keyword. Any type that <i>happens to have</i> those methods satisfies the interface automatically. So <code>*FlatIndex</code> and <code>*HNSW</code> both satisfy <code>Index</code> without any change to them.</p>
+      <p class="jargon"><b>Jargon:</b> <b>implicit / structural typing</b> = "if it has the methods, it fits" · <b>dependency inversion</b> = depend on the contract, not a concrete type.</p></div>
+    </details>
+
+    <details class="card"><summary>Decorator pattern</summary>
+      <div class="body"><p><code>PersistentIndex</code> (§9) <i>wraps</i> an <code>Index</code>, adds durability, and is <i>itself</i> an <code>Index</code>. So you can slip it in front of the real index and nothing downstream notices. That's the <b>decorator</b> pattern — and it only works because of the interface.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: how does one <code>server.New(idx)</code> accept both FlatIndex and HNSW?</summary>
+      <div class="ans">Because <code>New</code> takes an <code>index.Index</code> (the interface), not a concrete type. Both <code>*FlatIndex</code> and <code>*HNSW</code> have <code>Add/Search/Len</code>, so both satisfy <code>Index</code> implicitly. <code>main.go</code> picks one via the <code>-index</code> flag; the server just sees "an Index."</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="iface"> I get this</label>
+  </section>
+
+  <!-- ⑥ HNSW -->
+  <section id="hnsw">
+    <h2>⑥ ANN &amp; HNSW — the heart</h2>
+    <p class="lead">Checking ~log(n) vectors instead of all n. (Full visual: <a href="./hnsw.md">docs/hnsw.md</a>.)</p>
+
+    <details class="card"><summary>ANN &amp; recall <span class="tag">jargon</span></summary>
+      <div class="body"><p><b>ANN = Approximate Nearest Neighbor.</b> Trade a sliver of accuracy for a huge speed win. "Approximate" means it might miss a true neighbor occasionally — measured by <b>recall</b>.</p>
+      <p><b>recall@k</b> = of the k <i>true</i> nearest (per the exact index), what fraction did we find? 0.99 recall@10 = "found ~9.9 of the true top 10."</p></div>
+    </details>
+
+    <details class="card"><summary>Proximity graph &amp; greedy search <span class="tag">jargon</span></summary>
+      <div class="body"><p>Put vectors in a <b>graph</b>: nodes = vectors, edges connect near neighbors. To search, do a <b>greedy walk</b>: from where you are, hop to the neighbor <i>closest to the query</i>; repeat until no neighbor is closer (a <b>local minimum</b>). Like finding someone across the country by always jumping to the friend nearest the target.</p></div>
+    </details>
+
+    <details class="card"><summary>Small world, skip lists &amp; the hierarchy <span class="tag">jargon</span></summary>
+      <div class="body"><p>A <b>small-world</b> graph lets you reach anywhere in few hops. HNSW borrows the <b>skip-list</b> trick — "express lanes" over a list turn O(n) into O(log n) — and stacks it into <b>layers</b>:</p>
+      <div class="flow">Layer 2   A ───────────────── E        few nodes, LONG hops  (express lanes)
+Layer 1   A ──── C ──── E ──── G        more nodes, medium hops
+Layer 0   A─B─C─D─E─F─G─H  (every node)  short hops, fine detail</div>
+      <p>A node's height comes from <b>randomLevel</b> — a biased coin flip that decays exponentially (~1/M per level), so most nodes sit only on layer 0 and few reach the top.</p></div>
+    </details>
+
+    <details class="card"><summary>Beam search &amp; ef <span class="tag">jargon</span></summary>
+      <div class="body"><p>Greedy keeps one node; <b>beam search</b> (Quiver's <code>searchLayer</code>) keeps the best <b>ef</b> candidates and a frontier to explore — so it doesn't get stuck and it returns top-k. <b>ef</b> is the <b>beam width</b>: bigger ef explores more → higher recall, slower. It's a <i>query-time</i> dial (change it per query, no rebuild).</p>
+      <p class="jargon"><b>Jargon:</b> <b>efSearch</b> (query breadth) vs <b>efConstruction</b> (build breadth) · <b>M</b> = max neighbors per node.</p></div>
+    </details>
+
+    <details class="card"><summary>Search &amp; insert, end to end</summary>
+      <div class="body"><p><b>Search:</b> start at the top <b>entry point</b>, greedily descend the sparse upper layers (big jumps to get <i>near</i>), then one ef-wide beam search on layer 0 for the exact top-k. "Zoom in."</p>
+      <p><b>Insert:</b> roll a level; descend from the top to that level; from there down to 0, beam-search + link to the M nearest (both directions); if taller than everything, become the new entry point.</p></div>
+    </details>
+
+    <details class="card"><summary>Degree capping / pruning <span class="tag">jargon</span></summary>
+      <div class="body"><p>Every insert adds back-edges, so popular nodes accumulate <i>unbounded</i> neighbors → search slows toward O(n). <b>pruneNeighbors</b> caps each node at <code>maxDegree</code> (2·M on layer 0, M above), keeping only the closest. In testing this dropped a hub from <b>106 → 16</b> neighbors while recall barely moved.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: why is HNSW ~O(log n), and what does raising <code>ef</code> cost you?</summary>
+      <div class="ans">The hierarchy is ~<code>log_M(n)</code> layers tall; a search does a cheap greedy hop per upper layer + one beam sweep at the bottom, so work grows like log(n), not n. Raising <b>ef</b> explores more of the graph → higher recall but lower throughput (slower). It's the recall↔speed dial.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="hnsw"> I get this</label>
+  </section>
+
+  <!-- ⑦ SERVER -->
+  <section id="server">
+    <h2>⑦ The HTTP server</h2>
+    <p class="lead">Turning the library into a service anything can call.</p>
+
+    <details class="card"><summary>REST / HTTP / JSON &amp; handlers <span class="tag">jargon</span></summary>
+      <div class="body"><p>Clients talk over <b>HTTP</b> (the web's request/response protocol) sending <b>JSON</b> (text data format). Quiver exposes <b>endpoints</b>: <code>POST /vectors</code>, <code>POST /query</code>, <code>GET /health</code>. A <b>handler</b> is the function that runs for an endpoint — it gets an <code>http.Request</code> (the incoming call, a pointer — one shared object) and an <code>http.ResponseWriter</code> (where you write the reply, an interface — already reference-like).</p></div>
+    </details>
+
+    <details class="card"><summary>Status codes &amp; DTOs <span class="tag">jargon</span></summary>
+      <div class="body"><p><b>Status codes</b> are the reply's verdict: <b>201</b> created, <b>200</b> ok, <b>400</b> bad request (<i>client's</i> fault — e.g. wrong dimension), <b>500</b> server error (<i>your</i> fault). 4xx = "you messed up," 5xx = "I messed up."</p>
+      <p>A <b>DTO</b> (Data Transfer Object) is a struct describing the wire shape, e.g. <code>addRequest{ID, Vector}</code>. <b>Struct tags</b> (<code>`json:"id"`</code>) map JSON keys to Go fields — decoupling the public API name from the Go name.</p>
+      <p class="jargon"><b>Jargon:</b> <b>marshal</b> = Go→JSON · <b>unmarshal/decode</b> = JSON→Go.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: a client sends a 2-dim vector to a 3-dim index. 400 or 500?</summary>
+      <div class="ans"><b>400.</b> The client sent malformed input — their fault. 500 is reserved for <i>unexpected</i> server failures. Choosing the right class is real API design: the caller can only see the status code, so it's how you communicate whose fault it is.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="server"> I get this</label>
+  </section>
+
+  <!-- ⑧ CONCURRENCY -->
+  <section id="concurrency">
+    <h2>⑧ Concurrency</h2>
+    <p class="lead">Many requests at once, without corrupting the index.</p>
+
+    <details class="card"><summary>Goroutines &amp; data races <span class="tag go">go</span></summary>
+      <div class="body"><p>The HTTP server runs <i>each request in its own <b>goroutine</b></i> (a lightweight thread). They all share one index. A <b>data race</b> = two goroutines touch the same memory, at least one writes, with no coordination → undefined behavior (corruption, crashes). Quiver's <code>Add</code> writes the graph while <code>Search</code> reads it → a race waiting to happen.</p></div>
+    </details>
+
+    <details class="card"><summary>Mutex, RWMutex &amp; the race detector <span class="tag go">go</span></summary>
+      <div class="body"><p>A <b>mutex</b> (mutual exclusion lock) lets only one goroutine into a <b>critical section</b> at a time. An <b>RWMutex</b> allows <i>many readers OR one writer</i> — ideal for a read-heavy search index: searches run concurrently, a write briefly blocks everyone. Go's <b>race detector</b> (<code>go test -race</code>) instruments memory to catch races at runtime — Quiver's tests run clean under it.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: why RWMutex instead of a plain Mutex here?</summary>
+      <div class="ans">Searches are read-only and vastly outnumber writes, and readers don't conflict with each other. A plain Mutex would needlessly serialize every search (one at a time). RWMutex lets all those reads happen simultaneously and only blocks them briefly during a write — much higher throughput.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="concurrency"> I get this</label>
+  </section>
+
+  <!-- ⑨ PERSISTENCE -->
+  <section id="persist">
+    <h2>⑨ Persistence — the write-ahead log</h2>
+    <p class="lead">Surviving a restart or crash.</p>
+
+    <details class="card"><summary>WAL, fsync &amp; durability <span class="tag">jargon</span></summary>
+      <div class="body"><p>The index lives in RAM — a restart wipes it. A <b>write-ahead log (WAL)</b> is an append-only file: <i>every</i> <code>Add</code> is written to disk (one JSON line) and <b>fsync</b>'d before it's considered done. <b>fsync</b> (Go's <code>File.Sync()</code>) forces the bytes onto durable storage instead of an OS buffer that a crash could lose — that's <b>durability</b>.</p></div>
+    </details>
+
+    <details class="card"><summary>Replay &amp; crash recovery <span class="tag">jargon</span></summary>
+      <div class="body"><p>On startup, Quiver <b>replays</b> the log — re-applying every logged <code>Add</code> — to rebuild the exact index. So a hard kill loses nothing: the writes are on disk, and replay restores them. (A future <b>snapshot</b> would bound how much log you must replay.)</p>
+      <p>Wiring: <code>PersistentIndex</code> is a <i>decorator</i> (§5) — it logs writes, replays on open, and delegates the rest. The server can't tell it's persistent.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: why does <code>Append</code> call <code>Sync()</code>, and what breaks without it?</summary>
+      <div class="ans"><code>Sync()</code> = fsync = force the write to actual disk. Without it, the OS may hold the data in a buffer; a crash before the flush loses that write even though the call "succeeded." Sync is what makes the log <i>durable</i> — the whole point of a <i>write-ahead</i> log.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="persist"> I get this</label>
+  </section>
+
+  <!-- ⑩ BENCH -->
+  <section id="bench">
+    <h2>⑩ Benchmarks &amp; evaluation</h2>
+    <p class="lead">Proving it works — with numbers, not vibes.</p>
+
+    <details class="card"><summary>recall@k, QPS, latency <span class="tag">jargon</span></summary>
+      <div class="body"><p><b>recall@k</b> = accuracy (fraction of true top-k found). <b>QPS</b> = queries per second (throughput). <b>latency</b> = time per query (ms); often reported as <b>percentiles</b> (p50 = median, p99 = "99% are faster than this"). Good search = high recall AND high QPS AND low latency — usually a <b>tradeoff</b> you tune.</p></div>
+    </details>
+
+    <details class="card"><summary>Ground truth, SIFT &amp; the Pareto curve <span class="tag">jargon</span></summary>
+      <div class="body"><p><b>Ground truth</b> = the known-correct answers. <b>SIFT</b> is a standard benchmark dataset that <i>ships</i> ground-truth neighbors, so recall is measured against a trusted reference (not your own index). Quiver on SIFT10K:</p>
+      <div class="flow">ef   recall@10   throughput
+16   0.919       16,100 QPS
+64   0.988        5,000 QPS
+128  0.990        2,470 QPS
+256  0.990          960 QPS</div>
+      <p>That's a <b>Pareto / tradeoff curve</b>: each ef is a different balance of accuracy vs speed. Retrieval + evaluation is exactly what AI-infra interviews probe.</p></div>
+    </details>
+
+    <details class="q"><summary>🤔 Check yourself: say "0.99 recall@10 at 5,000 QPS" in plain English.</summary>
+      <div class="ans">"For a typical query, we return about 9.9 of the 10 genuinely-closest vectors, and we can handle roughly 5,000 such queries per second on one CPU thread." High accuracy, high throughput.</div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="bench"> I get this</label>
+  </section>
+
+  <!-- ⑪ GO -->
+  <section id="go">
+    <h2>⑪ Go concepts you used</h2>
+    <p class="lead">The language mechanics that showed up.</p>
+    <details class="card"><summary>The grab-bag <span class="tag go">go</span></summary>
+      <div class="body">
+      <p><span class="pill">slice</span> a growable view over an array (<code>[]T</code>); <code>append</code> returns a (possibly new) slice — you must reassign it.</p>
+      <p><span class="pill">pointer</span> <code>&amp;x</code> = "address of x"; <code>*T</code> = "pointer to T". You pass a pointer so a function can modify <i>your</i> variable (e.g. <code>json.Decode(&amp;req)</code> fills <code>req</code>).</p>
+      <p><span class="pill">pointer vs value receiver</span> methods on <code>*T</code> can mutate the struct; on <code>T</code> get a copy.</p>
+      <p><span class="pill">error values</span> errors are ordinary return values; compare with <code>errors.Is</code>; define sentinels like <code>ErrDimMismatch</code>.</p>
+      <p><span class="pill">struct tags</span> <code>`json:"id"`</code> — metadata steering JSON encode/decode.</p>
+      <p><span class="pill">defer</span> runs a call when the function returns (e.g. <code>defer mu.Unlock()</code>) — guarantees cleanup on every path.</p>
+      <p><span class="pill">exported vs unexported</span> Capitalized = public across packages; lowercase = private to the package.</p>
+      <p><span class="pill">flag</span> stdlib command-line flags — all must be declared <i>before</i> <code>flag.Parse()</code>.</p>
+      <p><span class="pill">table-driven tests</span> list cases in a slice, loop with <code>t.Run</code>; the idiomatic Go test style.</p>
+      </div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="go"> I get this</label>
+  </section>
+
+  <!-- ⑫ FLOW -->
+  <section id="flow">
+    <h2>⑫ End-to-end flow (everything, in order)</h2>
+    <p class="lead">Follow one insert and one query all the way through.</p>
+
+    <details class="card" open><summary>INSERT — <code>POST /vectors</code></summary>
+      <div class="body"><div class="flow">curl POST /vectors {id, vector}
+  └─ server handler: decode JSON into addRequest (DTO)          [⑦]
+       └─ PersistentIndex.Add                                    [⑨ decorator]
+            ├─ idx.Add(...)  → HNSW insert:                      [⑥]
+            │     roll randomLevel → descend from entry (greedy)
+            │     → beam-search each layer → link M nearest
+            │     → pruneNeighbors (cap degree) → maybe new entry
+            │     (RWMutex write-lock guards it)                 [⑧]
+            └─ WAL.Append(record) → fsync to disk                [⑨ durability]
+  └─ respond 201 Created                                         [⑦ status code]</div></div>
+    </details>
+
+    <details class="card" open><summary>QUERY — <code>POST /query</code></summary>
+      <div class="body"><div class="flow">curl POST /query {vector, k}
+  └─ server handler: decode JSON into queryRequest (DTO)         [⑦]
+       └─ Index.Search(query, k)  → HNSW:                        [⑥]
+            Phase 1: from top entry, greedy-hop down sparse layers (get near)
+            Phase 2: ef-wide beam search on layer 0 (get exact top-k)
+            each hop scores with the metric (cosine/L2)          [③]
+            (RWMutex read-lock — many queries at once)           [⑧]
+  └─ map hits → results, encode JSON, respond 200                [⑦]</div></div>
+    </details>
+    <label class="done"><input type="checkbox" data-k="flow"> I get this</label>
+  </section>
+
+  <!-- ⑬ GLOSSARY -->
+  <section id="glossary" class="glossary">
+    <h2>⑬ Glossary (filterable)</h2>
+    <input id="gfilter" placeholder="Type to filter terms… (e.g. recall, mutex, ef)">
+    <dl id="glist">
+      <dt>ANN</dt><dd>Approximate Nearest Neighbor — trade a little accuracy for big speed.</dd>
+      <dt>Beam search</dt><dd>Search keeping the best <code>ef</code> candidates + a frontier; returns top-k. Quiver's <code>searchLayer</code>.</dd>
+      <dt>Big-O / O(n) / O(log n)</dt><dd>How cost scales with input size n — linear vs logarithmic.</dd>
+      <dt>Cosine similarity</dt><dd>Angle-based similarity, ignores magnitude; default for text. Range −1…1.</dd>
+      <dt>Data race</dt><dd>Concurrent access to memory with ≥1 write and no synchronization → undefined behavior.</dd>
+      <dt>Decorator</dt><dd>A wrapper that adds behavior while still satisfying the same interface (PersistentIndex).</dd>
+      <dt>Degree / degree capping</dt><dd>A node's neighbor count; capping bounds it so search stays fast (pruneNeighbors).</dd>
+      <dt>Dimension</dt><dd>Number of components in a vector (e.g. 384).</dd>
+      <dt>Dot product</dt><dd>Sum of products of matching components; primitive under other metrics.</dd>
+      <dt>Durability</dt><dd>A write, once acknowledged, survives crashes — achieved via fsync.</dd>
+      <dt>ef / efSearch / efConstruction</dt><dd>Beam width; the recall↔speed dial (search) / graph-quality dial (build).</dd>
+      <dt>Embedding</dt><dd>A vector from a model where similar meaning → nearby points.</dd>
+      <dt>Entry point</dt><dd>The top node where every HNSW search/insert begins.</dd>
+      <dt>fsync</dt><dd>Force buffered bytes to physical disk (Go's <code>File.Sync</code>).</dd>
+      <dt>Goroutine</dt><dd>A lightweight Go thread; the HTTP server runs one per request.</dd>
+      <dt>Greedy search</dt><dd>Repeatedly hop to the closest neighbor until none is closer (local minimum).</dd>
+      <dt>Ground truth</dt><dd>Known-correct answers used to measure recall.</dd>
+      <dt>HNSW</dt><dd>Hierarchical Navigable Small World — the layered graph ANN index.</dd>
+      <dt>Interface</dt><dd>A set of method signatures (a contract); satisfied implicitly in Go.</dd>
+      <dt>Index</dt><dd>Structure that stores vectors and answers similarity queries.</dd>
+      <dt>k-NN / top-k</dt><dd>The k nearest neighbors / returning the k best matches.</dd>
+      <dt>L2 / Euclidean</dt><dd>Straight-line distance; smaller = more similar.</dd>
+      <dt>Latency</dt><dd>Time per query (ms); often reported as percentiles (p50, p99).</dd>
+      <dt>M</dt><dd>Max neighbors a node links to per layer in HNSW.</dd>
+      <dt>Magnitude / norm</dt><dd>A vector's length, ‖v‖ = sqrt(sum of squares).</dd>
+      <dt>Metric</dt><dd>The chosen similarity/distance function (cosine or L2).</dd>
+      <dt>Mutex / RWMutex</dt><dd>Lock for exclusive access / many-readers-or-one-writer access.</dd>
+      <dt>Pareto / tradeoff curve</dt><dd>Set of best achievable balances between competing goals (recall vs QPS).</dd>
+      <dt>Pointer</dt><dd><code>&amp;x</code> address-of; <code>*T</code> pointer type; lets a function modify your variable.</dd>
+      <dt>Proximity graph</dt><dd>Graph where nodes are vectors and edges connect near neighbors.</dd>
+      <dt>QPS</dt><dd>Queries per second — throughput.</dd>
+      <dt>Recall@k</dt><dd>Fraction of the true top-k that the index actually returned.</dd>
+      <dt>Replay</dt><dd>Re-applying a WAL's records on startup to rebuild state.</dd>
+      <dt>Skip list</dt><dd>List with "express-lane" layers giving O(log n) traversal; HNSW's hierarchy idea.</dd>
+      <dt>Small world</dt><dd>Graph where any node is reachable in few hops.</dd>
+      <dt>Status code</dt><dd>HTTP result verdict: 2xx ok, 4xx client error, 5xx server error.</dd>
+      <dt>Struct tag</dt><dd>Field metadata like <code>`json:"id"`</code> controlling encode/decode.</dd>
+      <dt>Vector</dt><dd>An ordered list of numbers; a point in space.</dd>
+      <dt>WAL</dt><dd>Write-ahead log — append every write to disk before acking; replay to recover.</dd>
+    </dl>
+    <label class="done"><input type="checkbox" data-k="glossary"> I've skimmed the glossary</label>
+  </section>
+
+  <!-- ⑭ QUIZ -->
+  <section id="quiz">
+    <h2>⑭ Final self-test</h2>
+    <p class="lead">If you can answer these out loud, you can defend the whole project in an interview.</p>
+    <details class="q"><summary>1. Walk an insert from <code>curl</code> to disk.</summary><div class="ans">Handler decodes JSON→DTO → PersistentIndex.Add → HNSW insert (randomLevel, greedy descent, beam+link M nearest, prune, maybe new entry) under a write lock → WAL.Append + fsync → 201. (§12)</div></details>
+    <details class="q"><summary>2. Why is HNSW faster than FlatIndex, and what's the catch?</summary><div class="ans">Hierarchy → ~log(n) nodes examined vs O(n). Catch: it's <i>approximate</i> (recall &lt; 100%), tuned by ef. (§4, §6)</div></details>
+    <details class="q"><summary>3. Retrieval correctness vs semantic relevance — the difference?</summary><div class="ans">Quiver's job is to return the true nearest vectors by the metric (retrieval correctness). Whether those are <i>useful</i> depends on the embedding model + corpus (semantic relevance). A weak result is the data/model's fault, not the index's.</div></details>
+    <details class="q"><summary>4. Why RWMutex, and what proves it's correct?</summary><div class="ans">Read-heavy workload → many concurrent reads, exclusive writes. <code>go test -race</code> proves no data races. (§8)</div></details>
+    <details class="q"><summary>5. What makes the WAL durable, and how does recovery work?</summary><div class="ans">fsync on every Append forces bytes to disk; on startup, replay re-applies every record to rebuild the index. (§9)</div></details>
+    <details class="q"><summary>6. What does raising <code>ef</code> do to recall, QPS, and the graph?</summary><div class="ans">↑recall, ↓QPS; the graph is unchanged (ef is a query-time dial). (§6, §10)</div></details>
+    <label class="done"><input type="checkbox" data-k="quiz"> I can answer all six</label>
+  </section>
+</main>
+</div>
+
+<script>
+// progress tracking via localStorage
+const boxes = [...document.querySelectorAll('input[type=checkbox][data-k]')];
+const KEY='quiver_learn_progress';
+const saved = JSON.parse(localStorage.getItem(KEY)||'{}');
+function render(){
+  const done = boxes.filter(b=>b.checked).length;
+  const pct = Math.round(done/boxes.length*100);
+  document.getElementById('progbar').style.width = pct+'%';
+  document.getElementById('progtext').textContent = done+' / '+boxes.length+' understood';
+}
+boxes.forEach(b=>{
+  b.checked = !!saved[b.dataset.k];
+  b.addEventListener('change',()=>{
+    saved[b.dataset.k]=b.checked; localStorage.setItem(KEY,JSON.stringify(saved)); render();
+  });
+});
+render();
+
+// glossary filter
+const gf=document.getElementById('gfilter'), gl=document.getElementById('glist');
+gf&&gf.addEventListener('input',()=>{
+  const q=gf.value.toLowerCase();
+  [...gl.children].forEach(el=>{
+    if(el.tagName==='DT'){
+      const dd=el.nextElementSibling;
+      const hit=(el.textContent+' '+dd.textContent).toLowerCase().includes(q);
+      el.style.display=dd.style.display=hit?'':'none';
+    }
+  });
+});
+</script>
+</body>
+</html>

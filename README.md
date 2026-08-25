@@ -32,16 +32,35 @@ search by *building* them, not importing them.
 
 ## Benchmarks
 
-Exact `FlatIndex` vs. `HNSW`, same vectors, single-threaded (`go test -bench`),
-dim 32, `M=16`, `ef=64`, `k=10`, L2:
+### On the standard SIFT dataset (SIFT10K, real ground truth)
 
-| Vectors | FlatIndex (exact) | HNSW      | Speedup | HNSW recall@10 |
-|--------:|------------------:|----------:|--------:|---------------:|
-|   5,000 | 0.63 ms/query     | 0.33 ms   | 1.9×    | 0.992          |
-|  20,000 | 2.82 ms/query     | 0.44 ms   | **6.4×**| 0.966          |
+10,000 × 128-dim base vectors, 100 queries, **recall@10 measured against the
+dataset's provided ground truth**. Single-threaded, `M=16`. The `ef` dial trades
+recall for throughput:
 
-Flat search is O(n) — 4× the data, ~4× the time. HNSW barely moves (~log n), so
-the gap widens with scale. Recall is tuned by the query-time `ef` dial.
+| `ef` | recall@10 | throughput   | latency   |
+|-----:|----------:|-------------:|----------:|
+|   16 | 0.919     | 16,100 QPS   | 0.06 ms/q |
+|   64 | **0.988** |  5,000 QPS   | 0.20 ms/q |
+|  128 | 0.990     |  2,470 QPS   | 0.41 ms/q |
+|  256 | 0.990     |    960 QPS   | 1.05 ms/q |
+
+```sh
+# Reproducible; point the same tool at full SIFT1M for the million-scale run.
+go run ./cmd/siftbench -base siftsmall_base.fvecs \
+  -query siftsmall_query.fvecs -truth siftsmall_groundtruth.ivecs -ef 64
+```
+
+### vs. exact brute force (synthetic, showing the scaling law)
+
+`FlatIndex` (exact) vs. `HNSW`, dim 32, `M=16`, `ef=64`, L2:
+
+| Vectors | FlatIndex | HNSW    | Speedup  |
+|--------:|----------:|--------:|---------:|
+|   5,000 | 0.63 ms   | 0.33 ms | 1.9×     |
+|  20,000 | 2.82 ms   | 0.44 ms | **6.4×** |
+
+Flat search is O(n); HNSW is ~O(log n), so the gap widens with scale.
 
 ## How it works
 
@@ -100,7 +119,7 @@ make race    # tests under the race detector
 
 ## Status & roadmap
 
-**Done:** distance metrics → exact index → HTTP API → real embeddings → HNSW →
-concurrency → WAL persistence. **Next:** degree-capping + heap-backed candidate
-lists, and full benchmarks on the standard SIFT1M dataset. See
-[`ROADMAP.md`](./ROADMAP.md).
+**v1 complete:** distance metrics → exact index → HTTP API → real embeddings →
+HNSW → concurrency → WAL persistence → degree-capping → SIFT benchmarks.
+**Possible extensions:** heap-backed candidate lists (faster inner loop), a full
+SIFT1M run, a RAG "chat with docs" demo. See [`ROADMAP.md`](./ROADMAP.md).

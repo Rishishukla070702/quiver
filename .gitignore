@@ -25,3 +25,8 @@ Rishi_Shukla_Resume.pdf
 __pycache__/
 *.pyc
 .venv/
+
+# Benchmark datasets (downloaded, not committed)
+*.fvecs
+*.ivecs
+siftsmall/

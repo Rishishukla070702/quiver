@@ -305,14 +305,6 @@ func (h *HNSW) maxDegree(layer int) int {
 // pruneNeighbors caps node nodeIdx's neighbour list on the given layer at
 // maxDegree(layer), keeping the neighbours CLOSEST to nodeIdx. Without it,
 // popular nodes accumulate unbounded edges and search degrades toward O(n).
-//
-// TODO(rishi): implement.
-//   - cap := h.maxDegree(layer); if len(current neighbours) <= cap, return early.
-//   - Otherwise score each neighbour nb by its distance to nodeIdx's own vector:
-//     h.metric.fn(h.nodes[nodeIdx].vec, h.nodes[nb].vec).
-//   - Sort the neighbours best-first with h.metric.better and keep the first cap.
-//     A small []struct{ idx int; score float32 } + sort.Slice is the clean way;
-//     then write the kept indices back to h.nodes[nodeIdx].neighbors[layer].
 func (h *HNSW) pruneNeighbors(nodeIdx, layer int) {
 	limit := h.maxDegree(layer)
 	if len(h.nodes[nodeIdx].neighbors[layer]) <= limit {
